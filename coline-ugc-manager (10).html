@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coline Morlet · UGC Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#C97B63;--rose-light:#F2D5CB;--rose-pale:#FBF0EC;
+  --creme:#FAF6F1;--beige:#EDE3D8;--brun:#3A2318;--brun-mid:#7A5240;
+  --blanc:#FFFFFF;--text-muted:#9C7B6B;
+  --vert:#7EAF8E;--bleu:#7E9CB5;--rouge:#C9736B;--violet:#9E7EB5;--or:#C9A96E;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--creme);font-family:'Jost',sans-serif;color:var(--brun);min-height:100vh;}
+header{background:var(--brun);color:var(--rose-light);padding:0 20px;height:62px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;border-bottom:2px solid var(--rose);}
+.logo{font-family:'Dancing Script',cursive;font-size:21px;display:flex;align-items:center;gap:8px;color:var(--rose-light);}
+.logo small{font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--rose);margin-left:2px;align-self:flex-end;margin-bottom:4px;}
+nav{display:flex;gap:4px;flex-wrap:wrap;}
+nav button{background:transparent;color:var(--rose-light);border:1px solid var(--rose);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'Jost',sans-serif;letter-spacing:0.04em;transition:all 0.2s;}
+nav button.active,nav button:hover{background:var(--rose);color:var(--blanc);}
+#save-ind{font-size:11px;color:var(--rose);opacity:0;transition:opacity 0.3s;margin-left:10px;white-space:nowrap;}
+#save-ind.show{opacity:1;}
+main{max-width:1000px;margin:0 auto;padding:28px 18px 80px;}
+.view{display:none;}.view.active{display:block;}
+h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;font-style:italic;color:var(--rose);margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--beige);}
+.slabel{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:5px;display:block;}
+.card{background:var(--blanc);border:1px solid var(--beige);border-radius:12px;padding:20px;margin-bottom:14px;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px;}
+.stat-card{background:var(--blanc);border-radius:12px;padding:16px 10px;text-align:center;border-top:3px solid;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:36px;line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);}
+.btn{display:inline-block;border:none;border-radius:20px;padding:9px 20px;font-size:13px;cursor:pointer;font-family:'Jost',sans-serif;letter-spacing:0.04em;transition:all 0.2s;}
+.btn:hover{opacity:0.85;}
+.btn-primary{background:var(--rose);color:var(--blanc);}
+.btn-outline{background:var(--blanc);color:var(--brun);border:1px solid var(--beige);}
+.btn-outline:hover{border-color:var(--rose);color:var(--rose);}
+.btn-danger{background:var(--rouge);color:var(--blanc);}
+.btn-sm{padding:5px 13px;font-size:12px;}
+.btn-green{background:var(--vert);color:var(--blanc);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.field{margin-bottom:14px;}
+.field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:5px;display:block;}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--beige);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Jost',sans-serif;background:var(--creme);color:var(--brun);outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--rose);}
+.field textarea{min-height:80px;resize:vertical;}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;}
+.fsec{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin:20px 0 12px;padding-bottom:6px;border-bottom:1px dashed var(--beige);}
+.badge{display:inline-block;border-radius:20px;padding:3px 10px;font-size:11px;letter-spacing:0.03em;border:1px solid;}
+.tag-chip{display:inline-block;background:var(--rose-pale);color:var(--brun-mid);border:1px solid var(--rose-light);border-radius:20px;padding:2px 9px;font-size:11px;margin:2px;}
+.brand-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--blanc);border:1px solid var(--beige);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;}
+.brand-row:hover{border-color:var(--rose);box-shadow:0 3px 12px rgba(201,123,99,0.12);}
+.brand-name{font-size:15px;font-weight:500;margin-bottom:2px;}
+.brand-sub{font-size:11px;color:var(--text-muted);}
+.brand-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;}
+.sselect{font-size:11px;border:1px solid var(--beige);border-radius:8px;padding:3px 7px;background:var(--blanc);cursor:pointer;font-family:'Jost',sans-serif;}
+.search-bar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.search-bar input,.search-bar select{border:1px solid var(--beige);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Jost',sans-serif;background:var(--blanc);color:var(--brun);outline:none;}
+.search-bar input{flex:1;min-width:160px;}
+.cat-filters{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.cat-btn{border:1px solid var(--beige);border-radius:20px;padding:4px 12px;font-size:12px;cursor:pointer;background:var(--blanc);color:var(--text-muted);font-family:'Jost',sans-serif;transition:all 0.2s;}
+.cat-btn.active,.cat-btn:hover{background:var(--rose-pale);border-color:var(--rose);color:var(--rose);}
+/* MESSAGES */
+.msg-card{background:var(--rose-pale);border:1px solid var(--rose-light);border-radius:12px;padding:20px;margin-bottom:16px;}
+.msg-title-display{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);cursor:pointer;}
+.msg-title-display:hover{text-decoration:underline;}
+.msg-body-display{white-space:pre-wrap;font-size:13px;line-height:1.8;color:var(--brun);background:var(--blanc);border:1px solid var(--beige);border-radius:8px;padding:14px;margin-top:10px;}
+.msg-edit-area{width:100%;border:1px solid var(--rose-light);border-radius:8px;padding:12px;font-size:13px;font-family:'Jost',sans-serif;color:var(--brun);background:var(--blanc);resize:vertical;min-height:160px;outline:none;margin-top:8px;line-height:1.8;}
+.msg-title-input{width:100%;border:1px solid var(--rose-light);border-radius:8px;padding:8px 12px;font-size:14px;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--rose);background:var(--blanc);outline:none;margin-bottom:8px;}
+/* TABLES */
+.rtable{width:100%;border-collapse:collapse;font-size:13px;}
+.rtable th{background:var(--rose-pale);color:var(--rose);font-weight:500;padding:10px 12px;text-align:left;border-bottom:2px solid var(--rose-light);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;}
+.rtable td{padding:10px 12px;border-bottom:1px solid var(--beige);vertical-align:middle;}
+.rtable tr:hover td{background:var(--creme);}
+.rtable tr:last-child td{border-bottom:none;}
+.overdue{color:var(--rouge);font-weight:700;}
+/* FINANCES */
+.fin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.fin-card{background:var(--blanc);border:1px solid var(--beige);border-radius:12px;padding:18px;text-align:center;}
+.fin-num{font-family:'Cormorant Garamond',serif;font-size:30px;margin-bottom:4px;}
+.fin-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);}
+.prog-bar{height:8px;background:var(--beige);border-radius:10px;overflow:hidden;margin-top:8px;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--rose-light),var(--rose));border-radius:10px;transition:width 0.5s;}
+/* TABS */
+.tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--beige);}
+.tab-btn{background:none;border:none;padding:10px 18px;font-size:13px;cursor:pointer;font-family:'Jost',sans-serif;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
+.tab-btn.active{color:var(--rose);border-bottom-color:var(--rose);font-weight:500;}
+/* DETAIL */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.iblock{padding:12px 16px;background:var(--creme);border:1px solid var(--beige);border-radius:10px;}
+.ival{font-size:14px;margin-top:4px;}
+.ival a{color:var(--bleu);text-decoration:none;}
+/* HOMEPAGE */
+.profile-banner{background:linear-gradient(135deg,var(--brun) 0%,var(--brun-mid) 100%);border-radius:16px;padding:28px;margin-bottom:20px;display:flex;align-items:center;gap:24px;position:relative;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--rose);background:var(--rose-pale);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden;}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-family:'Dancing Script',cursive;font-size:28px;color:var(--rose-light);margin-bottom:4px;}
+.profile-bio{font-size:13px;color:var(--beige);line-height:1.6;max-width:500px;}
+.edit-profile-btn{position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);color:var(--rose-light);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Jost',sans-serif;transition:all 0.2s;}
+.edit-profile-btn:hover{background:rgba(255,255,255,0.2);}
+.notes-rapides{background:var(--blanc);border:1px solid var(--beige);border-radius:12px;padding:20px;margin-bottom:14px;}
+.note-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--beige);}
+.note-item:last-child{border-bottom:none;}
+.note-dot{width:8px;height:8px;border-radius:50%;background:var(--rose);flex-shrink:0;margin-top:5px;}
+.note-text{flex:1;font-size:14px;line-height:1.5;}
+.note-del{color:var(--text-muted);cursor:pointer;font-size:16px;padding:0 4px;}
+.note-del:hover{color:var(--rouge);}
+/* IMPORT */
+.import-zone{border:2px dashed var(--beige);border-radius:12px;padding:30px;text-align:center;color:var(--text-muted);transition:all 0.2s;cursor:pointer;}
+.import-zone:hover,.import-zone.drag{border-color:var(--rose);background:var(--rose-pale);}
+.import-zone p{margin-bottom:10px;font-size:14px;}
+.csv-preview{overflow-x:auto;margin-top:16px;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(58,35,24,0.5);z-index:500;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--blanc);border-radius:16px;padding:28px;max-width:420px;width:92%;text-align:center;}
+.modal-wide{max-width:620px;}
+.modal p{font-size:15px;margin-bottom:18px;line-height:1.6;}
+.modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--brun);color:var(--rose-light);padding:10px 24px;border-radius:20px;font-size:13px;opacity:0;transition:all 0.3s;z-index:999;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:50px 20px;color:var(--text-muted);}
+.empty .emoji{font-size:46px;margin-bottom:14px;}
+.empty p{margin-bottom:20px;font-size:14px;}
+.relance-alert{color:var(--rouge)!important;font-weight:700;}
+.inline-edit{border:none;background:transparent;font-family:inherit;font-size:inherit;color:inherit;width:100%;outline:none;cursor:text;}
+.inline-edit:focus{background:var(--rose-pale);border-radius:4px;padding:2px 6px;}
+@media(max-width:600px){.form-grid,.detail-grid{grid-template-columns:1fr;}nav button{padding:4px 9px;font-size:11px;}.logo{font-size:17px;}h2{font-size:20px;}.profile-banner{flex-direction:column;text-align:center;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🌸 <span id="header-name">Coline Morlet</span> <small>UGC Manager</small></div>
+  <nav>
+    <button class="active" onclick="showView('dashboard')">Accueil</button>
+    <button onclick="showView('liste')">Marques</button>
+    <button onclick="openAdd()">+ Ajouter</button>
+    <button onclick="showView('relances')">Relances</button>
+    <button onclick="showView('finances')">Finances</button>
+    <button onclick="showView('messages')">Messages</button>
+    <button onclick="showView('import')">Import</button>
+  </nav>
+  <span id="save-ind">💾 Sauvegardé</span>
+</header>
+<main>
+
+<!-- DASHBOARD -->
+<div id="view-dashboard" class="view active">
+  <div id="profile-section"></div>
+  <div class="stat-grid" id="stats-grid"></div>
+  <div id="obj-dash"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;" id="dash-bottom">
+    <div id="dash-list"></div>
+    <div>
+      <div id="notes-section"></div>
+      <div id="rel-dash"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LISTE -->
+<div id="view-liste" class="view">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h2 style="margin-bottom:0;border:none;">💼 Mes marques</h2>
+    <button class="btn btn-primary" onclick="openAdd()">+ Ajouter</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Rechercher..." oninput="renderListe()">
+    <select id="filter-statut" onchange="renderListe()"><option value="tous">Tous les statuts</option></select>
+  </div>
+  <div class="cat-filters" id="cat-filters-liste"></div>
+  <div id="liste-brands"></div>
+</div>
+
+<!-- FORM -->
+<div id="view-form" class="view">
+  <h2 id="form-title">✨ Nouvelle marque</h2>
+  <div class="card">
+    <div class="fsec">Informations générales</div>
+    <div class="form-grid">
+      <div class="field"><label>Nom de la marque *</label><input id="f-nom" placeholder="ex : Atelier Rose"></div>
+      <div class="field"><label>Catégorie</label><select id="f-categorie"></select></div>
+      <div class="field"><label>Contact (prénom / nom)</label><input id="f-contact" placeholder="ex : Marie Dupont"></div>
+      <div class="field"><label>Canal principal</label>
+        <select id="f-canal"><option>Instagram DM</option><option>Email</option><option>Site web</option><option>Téléphone</option><option>LinkedIn</option><option>Autre</option></select>
+      </div>
+      <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="contact@marque.com"></div>
+      <div class="field"><label>Instagram</label><input id="f-instagram" placeholder="@nomducompte"></div>
+      <div class="field"><label>Site web</label><input id="f-site" placeholder="www.marque.com"></div>
+      <div class="field"><label>Téléphone</label><input id="f-tel" placeholder="06…"></div>
+    </div>
+    <div class="fsec">Statut & Relances</div>
+    <div class="form-grid">
+      <div class="field"><label>Statut</label><select id="f-statut"></select></div>
+      <div class="field"><label>Date du 1er contact</label><input id="f-date-contact" type="date"></div>
+      <div class="field"><label>Date relance 1</label><input id="f-date-r1" type="date"></div>
+      <div class="field"><label>Date relance 2</label><input id="f-date-r2" type="date"></div>
+      <div class="field"><label>Prochaine relance prévue</label><input id="f-date-relance" type="date"></div>
+      <div class="field"><label>Résultat final</label>
+        <select id="f-resultat">
+          <option value="">— En cours —</option>
+          <option value="positif">✅ Collaboration acceptée</option>
+          <option value="negatif">❌ Refus</option>
+          <option value="sans_reponse">🔇 Sans réponse</option>
+          <option value="plus_tard">⏳ Plus tard</option>
+        </select>
+      </div>
+    </div>
+    <div class="fsec">Contenu & Collaboration</div>
+    <div class="form-grid">
+      <div class="field"><label>Type de contenu</label>
+        <select id="f-type-contenu">
+          <option value="">— Choisir —</option>
+          <option>Vidéo UGC</option><option>Reels</option><option>TikTok</option>
+          <option>Photos</option><option>Unboxing</option><option>Storytelling</option>
+          <option>Démonstration</option><option>Pack multiple</option>
+        </select>
+      </div>
+      <div class="field"><label>Statut du contenu</label>
+        <select id="f-statut-contenu">
+          <option value="">— Choisir —</option>
+          <option value="a_creer">À créer</option><option value="en_creation">En création</option>
+          <option value="livre">Livré</option><option value="valide">Validé ✓</option>
+        </select>
+      </div>
+      <div class="field"><label>Date de livraison prévue</label><input id="f-date-livraison" type="date"></div>
+      <div class="field"><label>Produit / Collaboration</label>
+        <select id="f-produit-recu">
+          <option value="">— Choisir —</option>
+          <option value="non">Non</option><option value="oui">✅ Produit reçu</option>
+          <option value="collab_payee">💰 Collaboration payée</option><option value="mixte">Produit + paiement</option>
+        </select>
+      </div>
+      <div class="field"><label>Date réception produit</label><input id="f-date-produit" type="date"></div>
+    </div>
+    <div class="fsec">Finances</div>
+    <div class="form-grid">
+      <div class="field"><label>Tarif proposé</label><input id="f-tarif" placeholder="ex : 150 € / vidéo"></div>
+      <div class="field"><label>Montant facturé (€)</label><input id="f-montant" type="number" placeholder="0"></div>
+      <div class="field"><label>Statut paiement</label>
+        <select id="f-paiement">
+          <option value="">— Choisir —</option>
+          <option value="devis_envoye">Devis envoyé</option><option value="en_attente">En attente</option>
+          <option value="paye">Payé ✓</option><option value="offert">Produit offert (0€)</option>
+        </select>
+      </div>
+    </div>
+    <div class="fsec">Évaluation</div>
+    <div class="form-grid">
+      <div class="field"><label>Note expérience</label>
+        <select id="f-note">
+          <option value="">— Choisir —</option>
+          <option value="5">⭐⭐⭐⭐⭐ Excellente</option><option value="4">⭐⭐⭐⭐ Très bien</option>
+          <option value="3">⭐⭐⭐ Bien</option><option value="2">⭐⭐ Moyen</option><option value="1">⭐ Mauvaise</option>
+        </select>
+      </div>
+      <div class="field"><label>Paie dans les délais ?</label>
+        <select id="f-paie-delais">
+          <option value="">— Choisir —</option>
+          <option value="oui">✅ Oui</option><option value="non">❌ Non</option><option value="na">N/A</option>
+        </select>
+      </div>
+      <div class="field"><label>À recontacter ?</label>
+        <select id="f-recontacter">
+          <option value="">— Choisir —</option>
+          <option value="oui">✅ Oui, absolument</option><option value="peut_etre">🤔 Peut-être</option><option value="non">❌ Non, à éviter</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Tags</label><input id="f-tags" placeholder="ex : collab dream, priorité…"></div>
+    <div class="field"><label>Notes</label><textarea id="f-notes" placeholder="Contexte, infos importantes…"></textarea></div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="cancelForm()">Annuler</button>
+      <button class="btn btn-primary" onclick="submitForm()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div id="view-detail" class="view"><div id="detail-content"></div></div>
+
+<!-- RELANCES -->
+<div id="view-relances" class="view">
+  <h2>🔔 Suivi des relances</h2>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchRelTab('a_relancer',this)">⚠️ À relancer</button>
+    <button class="tab-btn" onclick="switchRelTab('toutes',this)">Toutes</button>
+    <button class="tab-btn" onclick="switchRelTab('terminees',this)">Terminées</button>
+  </div>
+  <div id="rel-table"></div>
+</div>
+
+<!-- FINANCES -->
+<div id="view-finances" class="view">
+  <h2>💰 Suivi financier</h2>
+  <div id="fin-content"></div>
+</div>
+
+<!-- MESSAGES -->
+<div id="view-messages" class="view">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h2 style="margin-bottom:0;border:none;">✉️ Messages types</h2>
+    <button class="btn btn-primary" onclick="addNewMsg()">+ Nouveau message</button>
+  </div>
+  <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">💡 Clique sur le titre ou le texte pour modifier directement. Tes modifications sont sauvegardées automatiquement.</p>
+  <div id="messages-list"></div>
+</div>
+
+<!-- IMPORT -->
+<div id="view-import" class="view">
+  <h2>📥 Importer des marques</h2>
+  <div class="card" style="margin-bottom:16px;">
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:12px;">Comment préparer ton fichier CSV ?</p>
+    <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:12px;">Tu peux exporter depuis <strong>Excel, Google Sheets ou Notion</strong> en format CSV. Ton fichier doit avoir une ligne d'en-tête. Les colonnes reconnues automatiquement sont :</p>
+    <div style="background:var(--creme);border-radius:8px;padding:14px;font-size:12px;font-family:monospace;color:var(--brun-mid);margin-bottom:14px;overflow-x:auto;">
+      nom, email, instagram, site, telephone, categorie, statut, canal_principal, contact_nom, notes, tags, tarif_propose
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);">Seule la colonne <strong>nom</strong> est obligatoire. Les autres sont optionnelles.</p>
+  </div>
+  <!-- EXPORT CARD -->
+  <div class="card" style="margin-bottom:16px;border-color:var(--vert);">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--vert);margin-bottom:4px;">💾 Exporter mes marques</p>
+        <p style="font-size:13px;color:var(--text-muted);">Télécharge toutes tes marques en CSV — pour sauvegarde ou import ailleurs.</p>
+      </div>
+      <button class="btn btn-green" onclick="exportCSV()">Télécharger CSV</button>
+    </div>
+  </div>
+
+  <!-- DEDUP CARD -->
+  <div class="card" style="margin-bottom:16px;border-color:var(--or);">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:4px;">🧹 Supprimer les doublons</p>
+        <p style="font-size:13px;color:var(--text-muted);">Détecte les marques avec le même nom et garde celle qui a le plus d'informations renseignées.</p>
+      </div>
+      <button class="btn btn-primary" onclick="dedupBrands()">Nettoyer les doublons</button>
+    </div>
+    <div id="dedup-result"></div>
+  </div>
+
+  <div class="import-zone" id="drop-zone" onclick="document.getElementById('csv-input').click()"
+    ondragover="event.preventDefault();this.classList.add('drag')"
+    ondragleave="this.classList.remove('drag')"
+    ondrop="handleDrop(event)">
+    <div style="font-size:36px;margin-bottom:10px;">📂</div>
+    <p><strong>Clique ici ou glisse ton fichier CSV</strong></p>
+    <p style="font-size:12px;">Formats acceptés : .csv (séparateur virgule ou point-virgule)</p>
+    <input type="file" id="csv-input" accept=".csv,.txt" style="display:none" onchange="handleFile(this.files[0])">
+  </div>
+  <div id="csv-preview"></div>
+</div>
+
+</main>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal">
+    <p>Supprimer cette marque ?<br><span style="color:var(--text-muted);font-size:13px;">Cette action est irréversible.</span></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-delete')">Annuler</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-obj">
+  <div class="modal">
+    <p style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--rose);margin-bottom:16px;">🎯 Objectifs du mois</p>
+    <div class="field"><label>Objectif revenus (€)</label><input id="obj-rev" type="number" placeholder="ex : 2000"></div>
+    <div class="field"><label>Objectif collaborations</label><input id="obj-col" type="number" placeholder="ex : 5"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-obj')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveObj()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-profile">
+  <div class="modal modal-wide">
+    <p style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--rose);margin-bottom:16px;">✏️ Personnaliser mon profil</p>
+    <div class="field"><label>Mon prénom / nom</label><input id="p-nom" placeholder="Coline Morlet"></div>
+    <div class="field"><label>Ma spécialité (sous-titre)</label><input id="p-spec" placeholder="ex : Créatrice UGC · Lifestyle · DIY · Voyages"></div>
+    <div class="field"><label>Ma bio</label><textarea id="p-bio" placeholder="Quelques mots sur toi et ton activité UGC…" style="min-height:80px;"></textarea></div>
+    <div class="field"><label>Mon Instagram</label><input id="p-insta" placeholder="@maison_coline.couture"></div>
+    <div class="field"><label>Photo de profil (URL ou colle une image)</label><input id="p-photo" placeholder="https://... ou laisse vide pour l'emoji 🌸"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-profile')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveProfile()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-import-confirm">
+  <div class="modal modal-wide">
+    <p style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--rose);margin-bottom:12px;">📥 Confirmer l'import</p>
+    <p id="import-summary" style="font-size:14px;margin-bottom:16px;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-import-confirm')">Annuler</button>
+      <button class="btn btn-outline" onclick="importBrands('add')">Ajouter aux existantes</button>
+      <button class="btn btn-primary" onclick="importBrands('replace')">Remplacer tout</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ===================== DATA =====================
+const STATUTS=[
+  {id:"a_contacter",label:"À contacter",color:"#C9A96E",bg:"#FDF8EE"},
+  {id:"contacte",label:"Contacté",color:"#7E9CB5",bg:"#EEF3F8"},
+  {id:"en_attente",label:"En attente",color:"#C9A96E",bg:"#FDF8EE"},
+  {id:"reponse_pos",label:"Réponse positive ✓",color:"#7EAF8E",bg:"#EEF8F2"},
+  {id:"reponse_neg",label:"Réponse négative ✗",color:"#C9736B",bg:"#F8EEEE"},
+  {id:"en_cours",label:"En cours 🎬",color:"#9E7EB5",bg:"#F4EEF8"},
+  {id:"termine",label:"Terminé ⭐",color:"#9C7B6B",bg:"#F5F0EC"},
+];
+const CATS=[
+  {id:"lifestyle",label:"Lifestyle",emoji:"✨"},
+  {id:"animaux",label:"Animaux",emoji:"🐾"},
+  {id:"cuisine",label:"Cuisine",emoji:"🍳"},
+  {id:"mode",label:"Mode",emoji:"👗"},
+  {id:"beaute",label:"Beauté & Bien-être",emoji:"💆"},
+  {id:"deco",label:"Déco & Maison",emoji:"🏡"},
+  {id:"enfants",label:"Enfants & Bébé",emoji:"🍼"},
+  {id:"sport",label:"Sport & Fitness",emoji:"💪"},
+  {id:"voyage",label:"Voyage",emoji:"✈️"},
+  {id:"tech",label:"Tech & High-tech",emoji:"📱"},
+  {id:"autre",label:"Autre",emoji:"📦"},
+];
+const DEFAULT_MSGS=[
+  {id:"m1",titre:"1er contact — Instagram DM",corps:`Bonjour [Nom de la marque] 👋\n\nJe suis Coline, créatrice de contenu UGC (Lifestyle · DIY · Voyages). Avec plus de 27 000 abonnés sur @maison_coline.couture, je crée des contenus authentiques et engageants pour des marques qui souhaitent capter l'attention de leur audience.\n\nJe serais ravie de créer du contenu pour vous — des vidéos naturelles et percutantes qui parlent vraiment à vos clients.\n\nSeriez-vous disponible pour en discuter ?\n\nÀ bientôt,\nColine 🌸`},
+  {id:"m2",titre:"Email de prospection",corps:`Objet : Collaboration UGC – Coline Morlet, Créatrice de Contenu\n\nBonjour,\n\nJe me permets de vous contacter au sujet d'une potentielle collaboration UGC.\n\nJe suis Coline Morlet, créatrice de contenu UGC spécialisée Lifestyle, DIY et Voyages, avec plus de 27 000 abonnés sur Instagram (@maison_coline.couture). J'ai collaboré avec des marques comme Garnier, NYX, Pranarom ou encore Kindle.\n\nCe que je propose :\n• Vidéos UGC authentiques et performantes\n• Reels / TikTok organiques & publicitaires\n• Photos produits soignées\n• Scripts, montage, voix off\n• Droits d'utilisation inclus\n\nJe serais ravie d'échanger sur vos besoins.\n\nCordialement,\nColine Morlet\n📱 @maison_coline.couture\n📧 maisoncoline@gmail.com`},
+  {id:"m3",titre:"Message de relance",corps:`Bonjour [Prénom] 👋\n\nJe me permets de revenir vers vous suite à mon message du [date].\n\nJe reste très intéressée par une collaboration avec [Marque] et serais ravie d'en discuter si vous avez un moment.\n\nN'hésitez pas à me faire signe !\n\nÀ bientôt,\nColine 🌸`},
+  {id:"m4",titre:"Remerciement après collaboration",corps:`Bonjour [Prénom],\n\nMerci beaucoup pour cette belle collaboration — c'était un vrai plaisir de travailler avec [Marque] !\n\nJ'espère que les contenus vous ont plu, et je reste disponible pour de futures créations.\n\nÀ très bientôt j'espère 🌸\n\nColine`},
+  {id:"m5",titre:"Envoi du devis",corps:`Bonjour [Prénom],\n\nMerci pour votre intérêt ! Je vous adresse ci-joint mon devis pour la collaboration envisagée.\n\nN'hésitez pas à me contacter si vous avez des questions.\n\nÀ très bientôt,\nColine 🌸`},
+];
+
+// ===================== STATE =====================
+const AT_TOKEN = "patPH6uAScPklQKeW.134d6383505fd641252d70e15674348a2736c787176814f1d3b4b1b7f5e6e12f";
+const AT_BASE = "appJuZh55JT1wi4hE";
+const AT_URL = "https://api.airtable.com/v0/" + AT_BASE + "/";
+
+let marques=[];
+let objectifs={"revenus":0,"collabs":0};
+let msgs=JSON.parse(JSON.stringify(DEFAULT_MSGS));
+let profile={"nom":"Coline Morlet","spec":"Créatrice UGC · Lifestyle · DIY · Voyages","bio":"Je crée des vidéos UGC authentiques et performantes pour les marques qui souhaitent capter l'attention et engager leur audience.","insta":"@maison_coline.couture","photo":""};
+let notes=[];
+let currentView="dashboard",editingId=null,deleteTargetId=null,filterCat="toutes",relTab="a_relancer";
+let pendingImport=[];
+
+// ===================== AIRTABLE SYNC =====================
+const AT_HEADERS = {"Authorization":"Bearer "+AT_TOKEN,"Content-Type":"application/json"};
+
+async function atGet(table){
+  try{
+    let records=[],offset=null;
+    do{
+      let url=AT_URL+encodeURIComponent(table)+"?pageSize=100";
+      if(offset) url+="&offset="+offset;
+      const res=await fetch(url,{headers:AT_HEADERS});
+      const data=await res.json();
+      if(data.error){console.error("AT error:",data.error);return null;}
+      records=records.concat(data.records||[]);
+      offset=data.offset;
+    }while(offset);
+    return records;
+  }catch(e){console.error("AT GET error:",e);return null;}
+}
+
+async function atClear(table){
+  try{
+    const records=await atGet(table);
+    if(!records||records.length===0)return;
+    for(let i=0;i<records.length;i+=10){
+      const ids=records.slice(i,i+10).map(r=>r.id);
+      const qs=ids.map(id=>"records[]="+id).join("&");
+      await fetch(AT_URL+encodeURIComponent(table)+"?"+qs,{method:"DELETE",headers:AT_HEADERS});
+    }
+  }catch(e){console.error("AT DELETE error:",e);}
+}
+
+async function atCreate(table,fieldsArray){
+  try{
+    for(let i=0;i<fieldsArray.length;i+=10){
+      const batch=fieldsArray.slice(i,i+10).map(f=>({fields:f}));
+      await fetch(AT_URL+encodeURIComponent(table),{method:"POST",headers:AT_HEADERS,body:JSON.stringify({records:batch})});
+    }
+    return true;
+  }catch(e){console.error("AT CREATE error:",e);return false;}
+}
+
+async function saveSetting(key,value){
+  try{
+    const recs=await atGet("Settings");
+    const existing=recs?recs.find(r=>r.fields.key===key):null;
+    const payload={fields:{key,value:JSON.stringify(value)}};
+    if(existing){
+      await fetch(AT_URL+encodeURIComponent("Settings")+"/"+existing.id,{method:"PATCH",headers:AT_HEADERS,body:JSON.stringify(payload)});
+    }else{
+      await fetch(AT_URL+encodeURIComponent("Settings"),{method:"POST",headers:AT_HEADERS,body:JSON.stringify({records:[payload]})});
+    }
+  }catch(e){console.error("Save setting error:",e);}
+}
+
+async function loadAllData(){
+  showLoader(true);
+  try{
+    const mRecs=await atGet("Marques");
+    if(mRecs&&mRecs.length>0){
+      marques=mRecs.map(r=>({...r.fields,_atId:r.id}));
+    }else{
+      marques=JSON.parse(localStorage.getItem("coline_ugc_v2")||"[]");
+    }
+    const sRecs=await atGet("Settings");
+    if(sRecs&&sRecs.length>0){
+      sRecs.forEach(r=>{
+        const f=r.fields;
+        try{
+          if(f.key==="objectifs")objectifs=JSON.parse(f.value||"{}");
+          if(f.key==="msgs"&&f.value)msgs=JSON.parse(f.value);
+          if(f.key==="profile"&&f.value)profile=JSON.parse(f.value);
+          if(f.key==="notes"&&f.value)notes=JSON.parse(f.value);
+        }catch(e){}
+      });
+    }else{
+      objectifs=JSON.parse(localStorage.getItem("coline_ugc_obj")||'{"revenus":0,"collabs":0}');
+      msgs=JSON.parse(localStorage.getItem("coline_ugc_msgs")||JSON.stringify(DEFAULT_MSGS));
+      profile=JSON.parse(localStorage.getItem("coline_ugc_profile")||JSON.stringify(profile));
+      notes=JSON.parse(localStorage.getItem("coline_ugc_notes")||"[]");
+    }
+  }catch(e){
+    console.error("Load error:",e);
+    marques=JSON.parse(localStorage.getItem("coline_ugc_v2")||"[]");
+    objectifs=JSON.parse(localStorage.getItem("coline_ugc_obj")||'{"revenus":0,"collabs":0}');
+    msgs=JSON.parse(localStorage.getItem("coline_ugc_msgs")||JSON.stringify(DEFAULT_MSGS));
+    profile=JSON.parse(localStorage.getItem("coline_ugc_profile")||JSON.stringify(profile));
+    notes=JSON.parse(localStorage.getItem("coline_ugc_notes")||"[]");
+    toast("⚠️ Mode hors ligne — données locales chargées");
+  }
+  showLoader(false);
+  renderDash();
+  renderMsgs();
+}
+
+function showLoader(show){
+  let loader=document.getElementById("loader");
+  if(!loader){
+    loader=document.createElement("div");
+    loader.id="loader";
+    loader.style.cssText="position:fixed;inset:0;background:rgba(250,246,241,0.9);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:var(--rose);gap:14px;";
+    loader.innerHTML=`<div style="font-size:40px;">🌸</div><div>Chargement de tes données...</div><div style="font-size:13px;font-style:normal;font-family:'Jost',sans-serif;color:var(--text-muted);">Connexion à Google Sheets</div>`;
+    document.body.appendChild(loader);
+  }
+  loader.style.display=show?"flex":"none";
+}
+
+async function saveData(){
+  localStorage.setItem("coline_ugc_v2",JSON.stringify(marques));
+  flashSave();
+  // Sync to Airtable in background
+  syncMarquesToAirtable();
+}
+
+async function syncMarquesToAirtable(){
+  try {
+    await atClear("Marques");
+    if(marques.length===0) return;
+    const fields = marques.map(m=>{
+      const f={};
+      ["id","nom","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
+      "statut","date_contact","date_r1","date_r2","date_relance","resultat","type_contenu","statut_contenu",
+      "date_livraison","produit_recu","date_produit","tarif_propose","montant","paiement","note",
+      "paie_delais","recontacter","tags","notes","date_ajout"].forEach(k=>{
+        if(m[k]&&String(m[k]).trim()) f[k]=String(m[k]).trim();
+      });
+      if(!f.nom) f.nom="Sans nom";
+      return f;
+    });
+    await atCreate("Marques", fields);
+    console.log("Sync Airtable OK - "+fields.length+" marques");
+  } catch(e) {
+    console.error("Sync error:", e);
+  }
+}
+async function saveMsgs(){
+  localStorage.setItem("coline_ugc_msgs",JSON.stringify(msgs));
+  flashSave();
+  saveSetting("msgs", msgs);
+}
+async function saveObjData(){
+  localStorage.setItem("coline_ugc_obj",JSON.stringify(objectifs));
+  saveSetting("objectifs", objectifs);
+}
+async function saveProfileData(){
+  localStorage.setItem("coline_ugc_profile",JSON.stringify(profile));
+  saveSetting("profile", profile);
+}
+async function saveNotes(){
+  localStorage.setItem("coline_ugc_notes",JSON.stringify(notes));
+  saveSetting("notes", notes);
+}
+function flashSave(){const i=document.getElementById("save-ind");i.classList.add("show");setTimeout(()=>i.classList.remove("show"),2000);}
+
+// ===================== NAV =====================
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("view-"+name).classList.add("active");
+  currentView=name;
+  const map={dashboard:0,liste:1,relances:3,finances:4,messages:5,import:6};
+  if(map[name]!==undefined)document.querySelectorAll("nav button")[map[name]].classList.add("active");
+  if(name==="dashboard")renderDash();
+  if(name==="liste")renderListe();
+  if(name==="relances")renderRel();
+  if(name==="finances")renderFin();
+  if(name==="messages")renderMsgs();
+}
+
+// ===================== TOAST =====================
+function toast(msg,type){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.style.background=type==="ok"?"var(--vert)":"var(--brun)";
+  t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);
+}
+
+// ===================== HELPERS =====================
+function getSt(id){return STATUTS.find(s=>s.id===id)||STATUTS[0];}
+function getCat(id){return CATS.find(c=>c.id===id)||null;}
+function fmtD(d){if(!d)return"—";return new Date(d).toLocaleDateString("fr-FR");}
+function isOD(d){return d&&new Date(d)<new Date();}
+function stars(n){if(!n)return"—";return"⭐".repeat(parseInt(n));}
+function badge(st){const s=getSt(st);return`<span class="badge" style="color:${s.color};background:${s.bg};border-color:${s.color}">${s.label}</span>`;}
+function stOpts(sel){return STATUTS.map(s=>`<option value="${s.id}"${s.id===sel?" selected":""}>${s.label}</option>`).join("");}
+function catOpts(sel){return`<option value="">— Choisir —</option>`+CATS.map(c=>`<option value="${c.id}"${c.id===sel?" selected":""}>${c.emoji} ${c.label}</option>`).join("");}
+function closeModal(id){document.getElementById(id).classList.remove("open");}
+
+// ===================== DASHBOARD =====================
+function renderDash(){
+  // Profile banner
+  document.getElementById("profile-section").innerHTML=`
+    <div class="profile-banner" style="margin-bottom:20px;">
+      <div class="profile-avatar">${profile.photo?`<img src="${profile.photo}" onerror="this.parentElement.textContent='🌸'">`:"🌸"}</div>
+      <div>
+        <div class="profile-name">${profile.nom||"Mon nom"}</div>
+        <div style="font-size:12px;color:var(--rose-light);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">${profile.spec||""}</div>
+        <div class="profile-bio">${profile.bio||""}</div>
+        ${profile.insta?`<div style="margin-top:8px;font-size:12px;color:var(--rose-light);">📱 ${profile.insta}</div>`:""}
+      </div>
+      <button class="edit-profile-btn" onclick="openProfileModal()">✏️ Modifier mon profil</button>
+    </div>`;
+  document.getElementById("header-name").textContent=profile.nom||"Coline Morlet";
+
+  // Stats
+  const total=marques.length;
+  const aCont=marques.filter(m=>m.statut==="a_contacter").length;
+  const enC=marques.filter(m=>m.statut==="en_cours").length;
+  const term=marques.filter(m=>m.statut==="termine").length;
+  const rev=marques.filter(m=>m.paiement==="paye").reduce((a,m)=>a+parseFloat(m.montant||0),0);
+  const aRel=marques.filter(m=>m.date_relance&&isOD(m.date_relance)&&m.statut!=="termine").length;
+  document.getElementById("stats-grid").innerHTML=`
+    <div class="stat-card" style="border-color:var(--rose)"><div class="stat-num" style="color:var(--rose)">${total}</div><div class="stat-lbl">Marques</div></div>
+    <div class="stat-card" style="border-color:var(--or)"><div class="stat-num" style="color:var(--or)">${aCont}</div><div class="stat-lbl">À contacter</div></div>
+    <div class="stat-card" style="border-color:var(--violet)"><div class="stat-num" style="color:var(--violet)">${enC}</div><div class="stat-lbl">En cours</div></div>
+    <div class="stat-card" style="border-color:var(--vert)"><div class="stat-num" style="color:var(--vert)">${term}</div><div class="stat-lbl">Terminées</div></div>
+    <div class="stat-card" style="border-color:var(--rouge)"><div class="stat-num" style="color:var(--rouge)">${aRel}</div><div class="stat-lbl">À relancer !</div></div>
+    <div class="stat-card" style="border-color:var(--vert)"><div class="stat-num" style="color:var(--vert);font-size:26px;">${rev}€</div><div class="stat-lbl">Revenus</div></div>
+  `;
+
+  // Objectifs
+  const pctR=objectifs.revenus>0?Math.min(100,Math.round(rev/objectifs.revenus*100)):0;
+  const cDone=marques.filter(m=>m.statut==="termine").length;
+  const pctC=objectifs.collabs>0?Math.min(100,Math.round(cDone/objectifs.collabs*100)):0;
+  document.getElementById("obj-dash").innerHTML=`
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);">🎯 Objectifs du mois</span>
+        <button class="btn btn-outline btn-sm" onclick="openObj()">Modifier</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span>Revenus</span><span style="color:var(--rose);font-weight:500;">${rev}€ / ${objectifs.revenus||"?"}€</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${pctR}%"></div></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${pctR}% atteint</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span>Collaborations</span><span style="color:var(--rose);font-weight:500;">${cDone} / ${objectifs.collabs||"?"}</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${pctC}%"></div></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${pctC}% atteint</div>
+        </div>
+      </div>
+    </div>`;
+
+  // Marques récentes
+  const el=document.getElementById("dash-list");
+  if(marques.length===0){
+    el.innerHTML=`<div class="card"><div class="empty" style="padding:30px 10px;"><div class="emoji">🌸</div><p>Ajoute ta première marque !</p><button class="btn btn-primary btn-sm" onclick="openAdd()">+ Ajouter</button></div></div>`;
+  } else {
+    el.innerHTML=`
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--rose);">Dernières marques</span>
+          <button class="btn btn-primary btn-sm" onclick="openAdd()">+ Ajouter</button>
+        </div>
+        ${marques.slice(0,4).map(m=>brandRow(m)).join("")}
+        ${marques.length>4?`<p style="text-align:center;font-size:12px;color:var(--text-muted);cursor:pointer;margin-top:10px;" onclick="showView('liste')">Voir toutes les ${marques.length} marques →</p>`:""}
+      </div>`;
+  }
+
+  // Notes rapides + relances
+  renderNotesSection();
+  const urg=marques.filter(m=>m.date_relance&&isOD(m.date_relance)&&m.statut!=="termine").slice(0,3);
+  const re=document.getElementById("rel-dash");
+  if(urg.length>0){
+    re.innerHTML=`<div class="card" style="border-color:var(--rouge);margin-top:0;">
+      <p style="font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--rouge);margin-bottom:12px;">⚠️ Relances urgentes</p>
+      ${urg.map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--beige);">
+        <div><div style="font-weight:500;font-size:13px;">${m.nom}</div><div style="font-size:11px;color:var(--rouge);">Prévue le ${fmtD(m.date_relance)}</div></div>
+        <button class="btn btn-outline btn-sm" onclick="openDetail('${m.id}')">→</button>
+      </div>`).join("")}
+      <p style="text-align:center;font-size:12px;color:var(--text-muted);cursor:pointer;margin-top:10px;" onclick="showView('relances')">Voir toutes →</p>
+    </div>`;
+  } else re.innerHTML="";
+}
+
+// ===================== NOTES RAPIDES =====================
+function renderNotesSection(){
+  const el=document.getElementById("notes-section");
+  el.innerHTML=`
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--rose);">📝 Notes rapides</span>
+      </div>
+      ${notes.length===0?`<p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">Aucune note pour le moment.</p>`:""}
+      <div id="notes-list">
+        ${notes.map((n,i)=>`<div class="note-item">
+          <div class="note-dot"></div>
+          <div class="note-text">${n}</div>
+          <span class="note-del" onclick="delNote(${i})">×</span>
+        </div>`).join("")}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input id="note-input" style="flex:1;border:1px solid var(--beige);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'Jost',sans-serif;background:var(--creme);color:var(--brun);outline:none;" placeholder="Ajouter une note..." onkeydown="if(event.key==='Enter')addNote()">
+        <button class="btn btn-primary btn-sm" onclick="addNote()">+</button>
+      </div>
+    </div>`;
+}
+function addNote(){
+  const inp=document.getElementById("note-input");
+  const val=inp.value.trim();
+  if(!val)return;
+  notes.unshift(val);inp.value="";
+  saveNotes();renderNotesSection();
+}
+function delNote(i){notes.splice(i,1);saveNotes();renderNotesSection();}
+
+// ===================== PROFILE =====================
+function openProfileModal(){
+  document.getElementById("p-nom").value=profile.nom||"";
+  document.getElementById("p-spec").value=profile.spec||"";
+  document.getElementById("p-bio").value=profile.bio||"";
+  document.getElementById("p-insta").value=profile.insta||"";
+  document.getElementById("p-photo").value=profile.photo||"";
+  document.getElementById("modal-profile").classList.add("open");
+}
+function saveProfile(){
+  profile.nom=document.getElementById("p-nom").value.trim();
+  profile.spec=document.getElementById("p-spec").value.trim();
+  profile.bio=document.getElementById("p-bio").value.trim();
+  profile.insta=document.getElementById("p-insta").value.trim();
+  profile.photo=document.getElementById("p-photo").value.trim();
+  saveProfileData();
+  closeModal("modal-profile");toast("Profil mis à jour ✓","ok");
+  renderDash();
+}
+
+// ===================== LISTE =====================
+function renderListe(){
+  const sel=document.getElementById("filter-statut");
+  if(sel&&sel.options.length<=1){STATUTS.forEach(s=>{const o=document.createElement("option");o.value=s.id;o.textContent=s.label;sel.appendChild(o);});}
+  const cf=document.getElementById("cat-filters-liste");
+  if(cf){cf.innerHTML=`<button class="cat-btn ${filterCat==="toutes"?"active":""}" onclick="setFC('toutes')">Toutes</button>`
+    +CATS.map(c=>`<button class="cat-btn ${filterCat===c.id?"active":""}" onclick="setFC('${c.id}')">${c.emoji} ${c.label}</button>`).join("");}
+  const q=(document.getElementById("search-input")?.value||"").toLowerCase();
+  const fs=document.getElementById("filter-statut")?.value||"tous";
+  const filtered=marques.filter(m=>{
+    const mQ=!q||m.nom.toLowerCase().includes(q)||(m.tags||"").toLowerCase().includes(q);
+    const mS=fs==="tous"||m.statut===fs;
+    const mC=filterCat==="toutes"||m.categorie===filterCat;
+    return mQ&&mS&&mC;
+  });
+  const el=document.getElementById("liste-brands");
+  el.innerHTML=filtered.length===0?`<div class="empty"><p>Aucune marque trouvée.</p></div>`:filtered.map(m=>brandRow(m)).join("");
+}
+function setFC(id){filterCat=id;renderListe();}
+function brandRow(m){
+  const s=getSt(m.statut);const cat=getCat(m.categorie);
+  return`<div class="brand-row" onclick="openDetail('${m.id}')">
+    <div style="flex:1;min-width:0;">
+      <div class="brand-name">${m.nom}${cat?` ${cat.emoji}`:""}</div>
+      <div class="brand-sub">${cat?cat.label+" · ":""}${m.canal_principal||""}${m.date_contact?" · "+fmtD(m.date_contact):""}</div>
+    </div>
+    <div class="brand-right">
+      <span class="badge" style="color:${s.color};background:${s.bg};border-color:${s.color}">${s.label}</span>
+      <select class="sselect" onchange="chSt('${m.id}',this.value)" onclick="event.stopPropagation()">${stOpts(m.statut)}</select>
+    </div>
+  </div>`;
+}
+function chSt(id,st){marques=marques.map(m=>m.id===id?{...m,statut:st}:m);saveData();toast("Statut mis à jour ✓");if(currentView==="liste")renderListe();if(currentView==="dashboard")renderDash();}
+
+// ===================== FORM =====================
+function openAdd(){
+  editingId=null;
+  document.getElementById("form-title").textContent="✨ Nouvelle marque";
+  document.getElementById("f-statut").innerHTML=stOpts("a_contacter");
+  document.getElementById("f-categorie").innerHTML=catOpts("");
+  ["nom","contact","email","instagram","site","tel","tarif","tags","notes"].forEach(k=>{const e=document.getElementById("f-"+k);if(e)e.value="";});
+  ["date-contact","date-r1","date-r2","date-relance","date-livraison","date-produit","montant"].forEach(k=>{const e=document.getElementById("f-"+k);if(e)e.value="";});
+  ["canal","resultat","type-contenu","statut-contenu","produit-recu","paiement","note","paie-delais","recontacter"].forEach(k=>{const e=document.getElementById("f-"+k);if(e)e.value="";});
+  document.getElementById("f-canal").value="Instagram DM";
+  showView("form");
+}
+function openEdit(id){
+  const m=marques.find(x=>x.id===id);if(!m)return;
+  editingId=id;
+  document.getElementById("form-title").textContent="✏️ Modifier la marque";
+  document.getElementById("f-statut").innerHTML=stOpts(m.statut);
+  document.getElementById("f-categorie").innerHTML=catOpts(m.categorie||"");
+  const tf={nom:"nom",contact:"contact_nom",email:"email",instagram:"instagram",site:"site",tel:"telephone",tarif:"tarif_propose",tags:"tags",notes:"notes",montant:"montant"};
+  Object.entries(tf).forEach(([k,v])=>{const e=document.getElementById("f-"+k);if(e)e.value=m[v]||"";});
+  const df={"date-contact":"date_contact","date-r1":"date_r1","date-r2":"date_r2","date-relance":"date_relance","date-livraison":"date_livraison","date-produit":"date_produit"};
+  Object.entries(df).forEach(([k,v])=>{const e=document.getElementById("f-"+k);if(e)e.value=m[v]||"";});
+  const sf={"canal":"canal_principal","resultat":"resultat","type-contenu":"type_contenu","statut-contenu":"statut_contenu","produit-recu":"produit_recu","paiement":"paiement","note":"note","paie-delais":"paie_delais","recontacter":"recontacter"};
+  Object.entries(sf).forEach(([k,v])=>{const e=document.getElementById("f-"+k);if(e)e.value=m[v]||"";});
+  showView("form");
+}
+function cancelForm(){if(editingId)openDetail(editingId);else showView("liste");}
+function submitForm(){
+  const nom=document.getElementById("f-nom").value.trim();
+  if(!nom){alert("Le nom de la marque est obligatoire.");return;}
+  const data={nom,statut:document.getElementById("f-statut").value,categorie:document.getElementById("f-categorie").value,
+    contact_nom:document.getElementById("f-contact").value.trim(),canal_principal:document.getElementById("f-canal").value,
+    email:document.getElementById("f-email").value.trim(),instagram:document.getElementById("f-instagram").value.trim(),
+    site:document.getElementById("f-site").value.trim(),telephone:document.getElementById("f-tel").value.trim(),
+    date_contact:document.getElementById("f-date-contact").value,date_r1:document.getElementById("f-date-r1").value,
+    date_r2:document.getElementById("f-date-r2").value,date_relance:document.getElementById("f-date-relance").value,
+    resultat:document.getElementById("f-resultat").value,type_contenu:document.getElementById("f-type-contenu").value,
+    statut_contenu:document.getElementById("f-statut-contenu").value,date_livraison:document.getElementById("f-date-livraison").value,
+    produit_recu:document.getElementById("f-produit-recu").value,date_produit:document.getElementById("f-date-produit").value,
+    tarif_propose:document.getElementById("f-tarif").value.trim(),montant:document.getElementById("f-montant").value,
+    paiement:document.getElementById("f-paiement").value,note:document.getElementById("f-note").value,
+    paie_delais:document.getElementById("f-paie-delais").value,recontacter:document.getElementById("f-recontacter").value,
+    tags:document.getElementById("f-tags").value.trim(),notes:document.getElementById("f-notes").value.trim(),
+  };
+  if(editingId){marques=marques.map(m=>m.id===editingId?{...m,...data}:m);saveData();toast("Modifications enregistrées ✓","ok");openDetail(editingId);}
+  else{const n={...data,id:Date.now().toString(),date_ajout:new Date().toISOString()};marques=[n,...marques];saveData();toast("Marque ajoutée ✓","ok");showView("liste");}
+}
+
+// ===================== DETAIL =====================
+function openDetail(id){
+  const m=marques.find(x=>x.id===id);if(!m)return;
+  const s=getSt(m.statut);const cat=getCat(m.categorie);
+  const rL={positif:"✅ Collaboration acceptée",negatif:"❌ Refus",sans_reponse:"🔇 Sans réponse",plus_tard:"⏳ Plus tard"};
+  const pL={devis_envoye:"Devis envoyé",en_attente:"En attente",paye:"Payé ✓",offert:"Produit offert"};
+  const rcL={oui:"✅ Oui, absolument",peut_etre:"🤔 Peut-être",non:"❌ Non, à éviter"};
+  const scL={a_creer:"À créer",en_creation:"En création",livre:"Livré",valide:"Validé ✓"};
+  const prL={non:"Non",oui:"✅ Produit reçu",collab_payee:"💰 Collab payée",mixte:"Produit + paiement"};
+  document.getElementById("detail-content").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn btn-outline btn-sm" onclick="showView('liste')">← Retour</button>
+      <h2 style="margin-bottom:0;border:none;flex:1;">${m.nom} ${cat?cat.emoji:""}</h2>
+      <button class="btn btn-outline btn-sm" onclick="openEdit('${m.id}')">✏️ Modifier</button>
+      <button class="btn btn-danger btn-sm" onclick="askDel('${m.id}')">🗑</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      ${badge(m.statut)}
+      ${cat?`<span class="badge" style="color:var(--brun-mid);background:var(--rose-pale);border-color:var(--rose-light)">${cat.emoji} ${cat.label}</span>`:""}
+      ${m.canal_principal?`<span class="badge" style="color:var(--bleu);background:#EEF3F8;border-color:var(--bleu)">${m.canal_principal}</span>`:""}
+      ${m.recontacter==="non"?`<span class="badge" style="color:var(--rouge);background:#F8EEEE;border-color:var(--rouge)">⚠️ À éviter</span>`:""}
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <span class="slabel">Changer le statut</span>
+      <select class="sselect" style="width:100%;font-size:13px;padding:8px;margin-top:6px;" onchange="chStD('${m.id}',this.value)">${stOpts(m.statut)}</select>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:10px;">📋 Coordonnées</p>
+    <div class="detail-grid" style="margin-bottom:14px;">
+      ${m.contact_nom?`<div class="iblock"><span class="slabel">Contact</span><div class="ival">${m.contact_nom}</div></div>`:""}
+      ${m.email?`<div class="iblock"><span class="slabel">Email</span><div class="ival"><a href="mailto:${m.email}">${m.email}</a></div></div>`:""}
+      ${m.instagram?`<div class="iblock"><span class="slabel">Instagram</span><div class="ival"><a href="https://instagram.com/${m.instagram.replace('@','')}" target="_blank">${m.instagram}</a></div></div>`:""}
+      ${m.site?`<div class="iblock"><span class="slabel">Site web</span><div class="ival"><a href="${m.site.startsWith('http')?m.site:'https://'+m.site}" target="_blank">${m.site}</a></div></div>`:""}
+      ${m.telephone?`<div class="iblock"><span class="slabel">Téléphone</span><div class="ival">${m.telephone}</div></div>`:""}
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:10px;">🔔 Suivi des relances</p>
+    <div class="detail-grid" style="margin-bottom:14px;">
+      <div class="iblock"><span class="slabel">1er contact</span><div class="ival">${fmtD(m.date_contact)}</div></div>
+      <div class="iblock"><span class="slabel">Relance 1</span><div class="ival">${fmtD(m.date_r1)}</div></div>
+      <div class="iblock"><span class="slabel">Relance 2</span><div class="ival">${fmtD(m.date_r2)}</div></div>
+      <div class="iblock"><span class="slabel">Prochaine relance</span><div class="ival ${isOD(m.date_relance)?"relance-alert":""}">${fmtD(m.date_relance)}${isOD(m.date_relance)?" ⚠️":""}</div></div>
+      <div class="iblock"><span class="slabel">Résultat final</span><div class="ival">${rL[m.resultat]||"— En cours —"}</div></div>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:10px;">🎬 Contenu</p>
+    <div class="detail-grid" style="margin-bottom:14px;">
+      ${m.type_contenu?`<div class="iblock"><span class="slabel">Type</span><div class="ival">${m.type_contenu}</div></div>`:""}
+      ${m.statut_contenu?`<div class="iblock"><span class="slabel">Statut contenu</span><div class="ival">${scL[m.statut_contenu]||""}</div></div>`:""}
+      ${m.date_livraison?`<div class="iblock"><span class="slabel">Livraison prévue</span><div class="ival">${fmtD(m.date_livraison)}</div></div>`:""}
+      ${m.produit_recu?`<div class="iblock"><span class="slabel">Produit / Collab</span><div class="ival">${prL[m.produit_recu]||""}</div></div>`:""}
+      ${m.date_produit?`<div class="iblock"><span class="slabel">Date réception</span><div class="ival">${fmtD(m.date_produit)}</div></div>`:""}
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:10px;">💰 Finances</p>
+    <div class="detail-grid" style="margin-bottom:14px;">
+      ${m.tarif_propose?`<div class="iblock"><span class="slabel">Tarif proposé</span><div class="ival" style="font-weight:600;font-size:16px;">${m.tarif_propose}</div></div>`:""}
+      ${m.montant?`<div class="iblock"><span class="slabel">Montant facturé</span><div class="ival" style="font-weight:600;font-size:16px;color:var(--vert);">${m.montant}€</div></div>`:""}
+      ${m.paiement?`<div class="iblock"><span class="slabel">Statut paiement</span><div class="ival">${pL[m.paiement]||""}</div></div>`:""}
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:10px;">⭐ Évaluation</p>
+    <div class="detail-grid" style="margin-bottom:14px;">
+      ${m.note?`<div class="iblock"><span class="slabel">Note</span><div class="ival">${stars(m.note)}</div></div>`:""}
+      ${m.paie_delais?`<div class="iblock"><span class="slabel">Paie dans les délais</span><div class="ival">${{oui:"✅ Oui",non:"❌ Non",na:"N/A"}[m.paie_delais]||""}</div></div>`:""}
+      ${m.recontacter?`<div class="iblock"><span class="slabel">À recontacter</span><div class="ival">${rcL[m.recontacter]||""}</div></div>`:""}
+    </div>
+    ${m.tags?`<div class="card" style="margin-bottom:14px;"><span class="slabel">Tags</span><div style="margin-top:8px">${m.tags.split(",").map(t=>`<span class="tag-chip">${t.trim()}</span>`).join("")}</div></div>`:""}
+    ${m.notes?`<div class="card"><span class="slabel">Notes</span><p style="margin-top:8px;line-height:1.7;font-size:14px;">${m.notes.replace(/\n/g,"<br>")}</p></div>`:""}
+  `;
+  showView("detail");
+}
+function chStD(id,st){marques=marques.map(m=>m.id===id?{...m,statut:st}:m);saveData();toast("Statut mis à jour ✓");openDetail(id);}
+
+// ===================== RELANCES =====================
+function switchRelTab(tab,btn){relTab=tab;document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");renderRel();}
+function renderRel(){
+  let list=marques;
+  if(relTab==="a_relancer")list=marques.filter(m=>m.date_relance&&isOD(m.date_relance)&&m.statut!=="termine");
+  if(relTab==="terminees")list=marques.filter(m=>m.statut==="termine");
+  const el=document.getElementById("rel-table");
+  const rL={positif:"✅ Acceptée",negatif:"❌ Refus",sans_reponse:"🔇 Sans réponse",plus_tard:"⏳ Plus tard"};
+  if(list.length===0){el.innerHTML=`<div class="empty"><div class="emoji">${relTab==="a_relancer"?"🎉":"📋"}</div><p>${relTab==="a_relancer"?"Aucune relance urgente !":"Aucune marque ici."}</p></div>`;return;}
+  el.innerHTML=`<div style="overflow-x:auto;"><table class="rtable"><thead><tr>
+    <th>Marque</th><th>1er contact</th><th>Relance 1</th><th>Relance 2</th><th>Prochaine relance</th><th>Résultat</th><th>Statut</th><th></th>
+  </tr></thead><tbody>
+    ${list.map(m=>{const s=getSt(m.statut);return`<tr>
+      <td><strong>${m.nom}</strong>${m.categorie&&getCat(m.categorie)?` ${getCat(m.categorie).emoji}`:""}</td>
+      <td>${fmtD(m.date_contact)}</td><td>${fmtD(m.date_r1)}</td><td>${fmtD(m.date_r2)}</td>
+      <td class="${isOD(m.date_relance)&&m.statut!=="termine"?"overdue":""}">${fmtD(m.date_relance)}${isOD(m.date_relance)&&m.statut!=="termine"?" ⚠️":""}</td>
+      <td>${rL[m.resultat]||"—"}</td>
+      <td><span class="badge" style="color:${s.color};background:${s.bg};border-color:${s.color};white-space:nowrap;">${s.label}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="openDetail('${m.id}')">→</button></td>
+    </tr>`;}).join("")}
+  </tbody></table></div>`;
+}
+
+// ===================== FINANCES =====================
+function renderFin(){
+  const paye=marques.filter(m=>m.paiement==="paye").reduce((a,m)=>a+parseFloat(m.montant||0),0);
+  const att=marques.filter(m=>m.paiement==="en_attente").reduce((a,m)=>a+parseFloat(m.montant||0),0);
+  const dev=marques.filter(m=>m.paiement==="devis_envoye").reduce((a,m)=>a+parseFloat(m.montant||0),0);
+  const pctR=objectifs.revenus>0?Math.min(100,Math.round(paye/objectifs.revenus*100)):0;
+  const pL={devis_envoye:"Devis envoyé",en_attente:"⏳ En attente",paye:"✅ Payé",offert:"Produit offert"};
+  document.getElementById("fin-content").innerHTML=`
+    <div class="fin-grid">
+      <div class="fin-card"><div class="fin-num" style="color:var(--vert)">${paye}€</div><div class="fin-lbl">Revenus reçus ✓</div></div>
+      <div class="fin-card"><div class="fin-num" style="color:var(--or)">${att}€</div><div class="fin-lbl">En attente</div></div>
+      <div class="fin-card"><div class="fin-num" style="color:var(--bleu)">${dev}€</div><div class="fin-lbl">Devis envoyés</div></div>
+      <div class="fin-card"><div class="fin-num" style="color:var(--rose)">${paye+att}€</div><div class="fin-lbl">Total potentiel</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);">🎯 Objectif mensuel</span>
+        <button class="btn btn-outline btn-sm" onclick="openObj()">Modifier</button>
+      </div>
+      <div style="font-size:13px;display:flex;justify-content:space-between;margin-bottom:6px;"><span>Revenus reçus</span><span style="color:var(--rose);font-weight:500;">${paye}€ / ${objectifs.revenus||"?"}€</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pctR}%"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${pctR}% atteint</div>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--rose);margin-bottom:12px;">📊 Détail par collaboration</p>
+    <div style="overflow-x:auto;"><table class="rtable"><thead><tr><th>Marque</th><th>Tarif proposé</th><th>Montant facturé</th><th>Statut paiement</th><th></th></tr></thead><tbody>
+      ${marques.filter(m=>m.montant||m.tarif_propose).map(m=>`<tr>
+        <td><strong>${m.nom}</strong></td><td>${m.tarif_propose||"—"}</td>
+        <td style="font-weight:600;color:${m.paiement==="paye"?"var(--vert)":"var(--brun)"};">${m.montant?m.montant+"€":"—"}</td>
+        <td>${pL[m.paiement]||"—"}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="openDetail('${m.id}')">→</button></td>
+      </tr>`).join("")}
+      ${marques.filter(m=>m.montant||m.tarif_propose).length===0?`<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Aucune donnée financière.</td></tr>`:""}
+    </tbody></table></div>`;
+}
+function openObj(){
+  document.getElementById("obj-rev").value=objectifs.revenus||"";
+  document.getElementById("obj-col").value=objectifs.collabs||"";
+  document.getElementById("modal-obj").classList.add("open");
+}
+function saveObj(){
+  objectifs.revenus=parseFloat(document.getElementById("obj-rev").value)||0;
+  objectifs.collabs=parseInt(document.getElementById("obj-col").value)||0;
+  saveObjData();closeModal("modal-obj");toast("Objectifs enregistrés ✓","ok");
+  if(currentView==="dashboard")renderDash();if(currentView==="finances")renderFin();
+}
+
+// ===================== MESSAGES ÉDITABLES =====================
+function renderMsgs(){
+  document.getElementById("messages-list").innerHTML=msgs.map((msg,i)=>`
+    <div class="msg-card" id="msgcard-${i}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;">
+        <input class="msg-title-input" value="${msg.titre.replace(/"/g,'&quot;')}" onchange="updateMsgTitle(${i},this.value)" style="flex:1;">
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn btn-outline btn-sm" id="copy-${i}" onclick="cpMsg(${i})">Copier</button>
+          <button class="btn btn-danger btn-sm" onclick="delMsg(${i})" title="Supprimer">🗑</button>
+        </div>
+      </div>
+      <textarea class="msg-edit-area" onchange="updateMsgCorps(${i},this.value)">${msg.corps}</textarea>
+    </div>`).join("")+
+    `<div class="card" style="border-style:dashed;text-align:center;color:var(--text-muted);padding:20px;">
+      <p>Clique directement sur le titre ou le texte pour modifier. Les changements sont sauvegardés automatiquement. 🌸</p>
+    </div>`;
+}
+function updateMsgTitle(i,val){msgs[i].titre=val;saveMsgs();}
+function updateMsgCorps(i,val){msgs[i].corps=val;saveMsgs();}
+function addNewMsg(){
+  msgs.push({id:"m"+Date.now(),titre:"Nouveau message",corps:"Écris ton message ici…"});
+  saveMsgs();renderMsgs();
+  setTimeout(()=>{const cards=document.querySelectorAll(".msg-card");if(cards.length)cards[cards.length-1].scrollIntoView({behavior:"smooth"});},100);
+}
+function delMsg(i){
+  if(msgs.length<=1){toast("Il faut au moins un message !");return;}
+  if(confirm("Supprimer ce message ?")){{msgs.splice(i,1);saveMsgs();renderMsgs();}}
+}
+function cpMsg(i){
+  navigator.clipboard.writeText(msgs[i].corps).then(()=>{
+    const b=document.getElementById("copy-"+i);b.textContent="✓ Copié !";b.style.background="var(--rose)";b.style.color="var(--blanc)";
+    setTimeout(()=>{b.textContent="Copier";b.style.background="";b.style.color="";},2000);
+  });
+}
+
+// ===================== IMPORT CSV =====================
+function handleDrop(e){
+  e.preventDefault();document.getElementById("drop-zone").classList.remove("drag");
+  const file=e.dataTransfer.files[0];if(file)handleFile(file);
+}
+function handleFile(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){parseCSV(e.target.result);};
+  reader.readAsText(file,'UTF-8');
+}
+function parseCSV(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<2){alert("Le fichier semble vide ou mal formaté.");return;}
+  // Detect separator
+  const sep=lines[0].includes(";")?";":",";
+  const headers=lines[0].split(sep).map(h=>h.trim().toLowerCase().replace(/['"]/g,""));
+  const FIELD_MAP={nom:"nom",name:"nom",marque:"nom",brand:"nom",
+    email:"email",mail:"email",instagram:"instagram","compte instagram":"instagram",insta:"instagram",
+    site:"site","site web":"site",website:"site",url:"site",
+    telephone:"telephone",tel:"telephone",phone:"telephone","numéro":"telephone",
+    categorie:"categorie","catégorie":"categorie",category:"categorie",secteur:"categorie",
+    statut:"statut",status:"statut",etat:"statut",
+    canal:"canal_principal","canal principal":"canal_principal",
+    contact:"contact_nom","nom contact":"contact_nom","prénom":"contact_nom",
+    notes:"notes",note:"notes",commentaire:"notes",
+    tags:"tags",tag:"tags",
+    tarif:"tarif_propose","tarif proposé":"tarif_propose",prix:"tarif_propose",
+  };
+  const imported=[];
+  for(let i=1;i<lines.length;i++){
+    if(!lines[i].trim())continue;
+    const vals=lines[i].split(sep).map(v=>v.trim().replace(/^["']|["']$/g,""));
+    const obj={statut:"a_contacter"};
+    headers.forEach((h,idx)=>{
+      const field=FIELD_MAP[h]||FIELD_MAP[h.replace(/[^a-z0-9 ]/g,"")]||null;
+      if(field&&vals[idx])obj[field]=vals[idx];
+    });
+    if(obj.nom){obj.id=Date.now().toString()+i;obj.date_ajout=new Date().toISOString();imported.push(obj);}
+  }
+  if(imported.length===0){alert("Aucune marque trouvée. Vérifie que ton fichier a bien une colonne 'nom'.");return;}
+  pendingImport=imported;
+  document.getElementById("import-summary").innerHTML=`<strong>${imported.length} marque(s)</strong> trouvée(s) dans ton fichier.<br><br>
+    <span style="font-size:13px;color:var(--text-muted);">Tu peux les <strong>ajouter</strong> à ta liste existante, ou <strong>remplacer</strong> toute ta liste.</span>`;
+  // Preview
+  document.getElementById("csv-preview").innerHTML=`
+    <div style="overflow-x:auto;margin-top:16px;"><table class="rtable">
+      <thead><tr><th>Nom</th><th>Email</th><th>Instagram</th><th>Catégorie</th><th>Canal</th><th>Notes</th></tr></thead>
+      <tbody>${imported.slice(0,5).map(m=>`<tr>
+        <td><strong>${m.nom}</strong></td><td>${m.email||"—"}</td><td>${m.instagram||"—"}</td>
+        <td>${m.categorie||"—"}</td><td>${m.canal_principal||"—"}</td><td>${(m.notes||"").substring(0,30)||"—"}</td>
+      </tr>`).join("")}
+      ${imported.length>5?`<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">… et ${imported.length-5} autres</td></tr>`:""}
+      </tbody></table></div>`;
+  document.getElementById("modal-import-confirm").classList.add("open");
+}
+function importBrands(mode){
+  if(mode==="replace")marques=pendingImport;
+  else marques=[...pendingImport,...marques];
+  saveData();closeModal("modal-import-confirm");
+  document.getElementById("csv-preview").innerHTML="";
+  document.getElementById("drop-zone").innerHTML=`<div style="font-size:36px;margin-bottom:10px;">✅</div><p><strong>${pendingImport.length} marque(s) importée(s) avec succès !</strong></p><p style="font-size:12px;margin-top:8px;cursor:pointer;" onclick="showView('liste')">Voir ma liste de marques →</p>`;
+  toast(`${pendingImport.length} marques importées !`,"ok");
+  pendingImport=[];
+}
+
+// ===================== EXPORT CSV =====================
+function exportCSV(){
+  if(marques.length===0){toast("Aucune marque à exporter !");return;}
+  const headers=["id","nom","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
+    "statut","date_contact","date_r1","date_r2","date_relance","resultat","type_contenu","statut_contenu",
+    "date_livraison","produit_recu","date_produit","tarif_propose","montant","paiement","note",
+    "paie_delais","recontacter","tags","notes","date_ajout"];
+  const rows=[headers.join(",")];
+  marques.forEach(m=>{
+    rows.push(headers.map(h=>{
+      const val=String(m[h]||"").replace(/"/g,'""');
+      return val.includes(",")||val.includes("\n")||val.includes('"')?`"${val}"`:val;
+    }).join(","));
+  });
+  const blob=new Blob(["\uFEFF"+rows.join("\n")],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="marques-ugc-coline.csv";
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast(`${marques.length} marques exportées ✓`,"ok");
+}
+
+// ===================== DEDUPLICATION =====================
+function dedupBrands(){
+  if(marques.length===0){toast("Aucune marque dans la liste !");return;}
+
+  // Compter le nombre de champs renseignés pour chaque marque
+  function score(m){
+    const fields=["nom","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
+      "date_contact","date_r1","date_r2","date_relance","resultat","type_contenu","statut_contenu",
+      "date_livraison","produit_recu","date_produit","tarif_propose","montant","paiement","note",
+      "paie_delais","recontacter","tags","notes"];
+    return fields.filter(f=>m[f]&&String(m[f]).trim()!=="").length;
+  }
+
+  // Grouper par nom normalisé (minuscules, sans espaces superflus)
+  const groups={};
+  marques.forEach(m=>{
+    const key=m.nom.trim().toLowerCase();
+    if(!groups[key])groups[key]=[];
+    groups[key].push(m);
+  });
+
+  let removed=0;
+  const deduped=[];
+  Object.values(groups).forEach(group=>{
+    if(group.length===1){
+      deduped.push(group[0]);
+    } else {
+      // Garder celle qui a le plus de champs renseignés
+      group.sort((a,b)=>score(b)-score(a));
+      deduped.push(group[0]);
+      removed+=group.length-1;
+    }
+  });
+
+  if(removed===0){
+    document.getElementById("dedup-result").innerHTML=`
+      <div style="margin-top:12px;padding:10px 14px;background:#EEFDF4;border:1px solid #7EAF8E;border-radius:8px;font-size:13px;color:#4A8A60;">
+        ✅ Aucun doublon trouvé ! Ta liste est déjà propre.
+      </div>`;
+    return;
+  }
+
+  marques=deduped;
+  saveData();
+  document.getElementById("dedup-result").innerHTML=`
+    <div style="margin-top:12px;padding:10px 14px;background:#EEFDF4;border:1px solid #7EAF8E;border-radius:8px;font-size:13px;color:#4A8A60;">
+      ✅ <strong>${removed} doublon(s) supprimé(s)</strong> — Il reste <strong>${deduped.length} marques</strong> dans ta liste.
+      <span style="margin-left:10px;cursor:pointer;color:var(--bleu);text-decoration:underline;" onclick="showView('liste')">Voir la liste →</span>
+    </div>`;
+  toast(`${removed} doublon(s) supprimé(s) ✓`,"ok");
+}
+
+// ===================== DELETE =====================
+function askDel(id){deleteTargetId=id;document.getElementById("modal-delete").classList.add("open");}
+function confirmDelete(){if(!deleteTargetId)return;marques=marques.filter(m=>m.id!==deleteTargetId);saveData();closeModal("modal-delete");toast("Marque supprimée");showView("liste");}
+
+// ===================== INIT =====================
+document.getElementById("f-statut").innerHTML=stOpts("a_contacter");
+document.getElementById("f-categorie").innerHTML=catOpts("");
+loadAllData();
+</script>
+</body>
+</html>
