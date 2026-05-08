@@ -452,16 +452,14 @@ let pendingImport=[];
 let isSyncing=false;
 
 // ===================== GOOGLE SHEETS SYNC =====================
-async function apiCall(payload){
+async function apiCall(action, payload){
   try {
-    const res = await fetch(GAS_URL, {
-      method:"POST",
-      body: JSON.stringify(payload)
-    });
+    let url = GAS_URL + "?action=" + action;
+    if(payload) url += "&payload=" + encodeURIComponent(JSON.stringify(payload));
+    const res = await fetch(url, { method:"GET" });
     return await res.json();
   } catch(e) {
     console.error("API error:", e);
-    // Fallback to localStorage if offline
     return null;
   }
 }
@@ -469,7 +467,7 @@ async function apiCall(payload){
 async function loadAllData(){
   showLoader(true);
   // Try Google Sheets first
-  const data = await apiCall({action:"getAll"});
+  const data = await apiCall("getAll");
   if(data && !data.error){
     if(data.marques && data.marques.length>0) marques=data.marques;
     else marques=JSON.parse(localStorage.getItem("coline_ugc_v2")||"[]");
@@ -512,24 +510,24 @@ async function saveData(){
   localStorage.setItem("coline_ugc_v2",JSON.stringify(marques));
   flashSave();
   // Then sync to Google Sheets
-  apiCall({action:"saveMarques",marques});
+  apiCall("saveMarques",{marques});
 }
 async function saveMsgs(){
   localStorage.setItem("coline_ugc_msgs",JSON.stringify(msgs));
   flashSave();
-  apiCall({action:"saveMsgs",msgs});
+  apiCall("saveMsgs",{msgs});
 }
 async function saveObjData(){
   localStorage.setItem("coline_ugc_obj",JSON.stringify(objectifs));
-  apiCall({action:"saveObjectifs",objectifs});
+  apiCall("saveObjectifs",{objectifs});
 }
 async function saveProfileData(){
   localStorage.setItem("coline_ugc_profile",JSON.stringify(profile));
-  apiCall({action:"saveProfile",profile});
+  apiCall("saveProfile",{profile});
 }
 async function saveNotes(){
   localStorage.setItem("coline_ugc_notes",JSON.stringify(notes));
-  apiCall({action:"saveNotes",notes});
+  apiCall("saveNotes",{notes});
 }
 function flashSave(){const i=document.getElementById("save-ind");i.classList.add("show");setTimeout(()=>i.classList.remove("show"),2000);}
 
