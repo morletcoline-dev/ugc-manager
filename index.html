@@ -440,7 +440,9 @@ const DEFAULT_MSGS=[
 ];
 
 // ===================== STATE =====================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbydx2zgP8_K299mq5JPp-5Uok2fTAKsVbzpgUP22uYDAl-QtZF9GKhwKIxkzaHLiyKA/exec";
+const AT_TOKEN = "patPH6uAScPklQKeW.134d6383505fd641252d70e15674348a2736c787176814f1d3b4b1b7f5e6e12f";
+const AT_BASE = "appJuZh55JT1wi4hE";
+const AT_URL = "https://api.airtable.com/v0/" + AT_BASE + "/";
 
 let marques=[];
 let objectifs={"revenus":0,"collabs":0};
@@ -449,38 +451,89 @@ let profile={"nom":"Coline Morlet","spec":"Créatrice UGC · Lifestyle · DIY ·
 let notes=[];
 let currentView="dashboard",editingId=null,deleteTargetId=null,filterCat="toutes",relTab="a_relancer";
 let pendingImport=[];
-let isSyncing=false;
 
-// ===================== GOOGLE SHEETS SYNC =====================
-async function apiCall(action, payload){
-  try {
-    let url = GAS_URL + "?action=" + action;
-    if(payload) url += "&payload=" + encodeURIComponent(JSON.stringify(payload));
-    const res = await fetch(url, { method:"GET" });
-    return await res.json();
-  } catch(e) {
-    console.error("API error:", e);
-    return null;
-  }
+// ===================== AIRTABLE SYNC =====================
+const AT_HEADERS = {"Authorization":"Bearer "+AT_TOKEN,"Content-Type":"application/json"};
+
+async function atGet(table){
+  try{
+    let records=[],offset=null;
+    do{
+      let url=AT_URL+encodeURIComponent(table)+"?pageSize=100";
+      if(offset) url+="&offset="+offset;
+      const res=await fetch(url,{headers:AT_HEADERS});
+      const data=await res.json();
+      if(data.error){console.error("AT error:",data.error);return null;}
+      records=records.concat(data.records||[]);
+      offset=data.offset;
+    }while(offset);
+    return records;
+  }catch(e){console.error("AT GET error:",e);return null;}
+}
+
+async function atClear(table){
+  try{
+    const records=await atGet(table);
+    if(!records||records.length===0)return;
+    for(let i=0;i<records.length;i+=10){
+      const ids=records.slice(i,i+10).map(r=>r.id);
+      const qs=ids.map(id=>"records[]="+id).join("&");
+      await fetch(AT_URL+encodeURIComponent(table)+"?"+qs,{method:"DELETE",headers:AT_HEADERS});
+    }
+  }catch(e){console.error("AT DELETE error:",e);}
+}
+
+async function atCreate(table,fieldsArray){
+  try{
+    for(let i=0;i<fieldsArray.length;i+=10){
+      const batch=fieldsArray.slice(i,i+10).map(f=>({fields:f}));
+      await fetch(AT_URL+encodeURIComponent(table),{method:"POST",headers:AT_HEADERS,body:JSON.stringify({records:batch})});
+    }
+    return true;
+  }catch(e){console.error("AT CREATE error:",e);return false;}
+}
+
+async function saveSetting(key,value){
+  try{
+    const recs=await atGet("Settings");
+    const existing=recs?recs.find(r=>r.fields.key===key):null;
+    const payload={fields:{key,value:JSON.stringify(value)}};
+    if(existing){
+      await fetch(AT_URL+encodeURIComponent("Settings")+"/"+existing.id,{method:"PATCH",headers:AT_HEADERS,body:JSON.stringify(payload)});
+    }else{
+      await fetch(AT_URL+encodeURIComponent("Settings"),{method:"POST",headers:AT_HEADERS,body:JSON.stringify({records:[payload]})});
+    }
+  }catch(e){console.error("Save setting error:",e);}
 }
 
 async function loadAllData(){
   showLoader(true);
-  // Try Google Sheets first
-  const data = await apiCall("getAll");
-  if(data && !data.error){
-    if(data.marques && data.marques.length>0) marques=data.marques;
-    else marques=JSON.parse(localStorage.getItem("coline_ugc_v2")||"[]");
-    if(data.objectifs && (data.objectifs.revenus||data.objectifs.collabs)) objectifs=data.objectifs;
-    else objectifs=JSON.parse(localStorage.getItem("coline_ugc_obj")||'{"revenus":0,"collabs":0}');
-    if(data.msgs && data.msgs.length>0) msgs=data.msgs;
-    else msgs=JSON.parse(localStorage.getItem("coline_ugc_msgs")||JSON.stringify(DEFAULT_MSGS));
-    if(data.profile && data.profile.nom) profile=data.profile;
-    else profile=JSON.parse(localStorage.getItem("coline_ugc_profile")||JSON.stringify(profile));
-    if(data.notes && data.notes.length>0) notes=data.notes;
-    else notes=JSON.parse(localStorage.getItem("coline_ugc_notes")||"[]");
-  } else {
-    // Offline fallback
+  try{
+    const mRecs=await atGet("Marques");
+    if(mRecs&&mRecs.length>0){
+      marques=mRecs.map(r=>({...r.fields,_atId:r.id}));
+    }else{
+      marques=JSON.parse(localStorage.getItem("coline_ugc_v2")||"[]");
+    }
+    const sRecs=await atGet("Settings");
+    if(sRecs&&sRecs.length>0){
+      sRecs.forEach(r=>{
+        const f=r.fields;
+        try{
+          if(f.key==="objectifs")objectifs=JSON.parse(f.value||"{}");
+          if(f.key==="msgs"&&f.value)msgs=JSON.parse(f.value);
+          if(f.key==="profile"&&f.value)profile=JSON.parse(f.value);
+          if(f.key==="notes"&&f.value)notes=JSON.parse(f.value);
+        }catch(e){}
+      });
+    }else{
+      objectifs=JSON.parse(localStorage.getItem("coline_ugc_obj")||'{"revenus":0,"collabs":0}');
+      msgs=JSON.parse(localStorage.getItem("coline_ugc_msgs")||JSON.stringify(DEFAULT_MSGS));
+      profile=JSON.parse(localStorage.getItem("coline_ugc_profile")||JSON.stringify(profile));
+      notes=JSON.parse(localStorage.getItem("coline_ugc_notes")||"[]");
+    }
+  }catch(e){
+    console.error("Load error:",e);
     marques=JSON.parse(localStorage.getItem("coline_ugc_v2")||"[]");
     objectifs=JSON.parse(localStorage.getItem("coline_ugc_obj")||'{"revenus":0,"collabs":0}');
     msgs=JSON.parse(localStorage.getItem("coline_ugc_msgs")||JSON.stringify(DEFAULT_MSGS));
@@ -506,28 +559,36 @@ function showLoader(show){
 }
 
 async function saveData(){
-  // Save locally first (instant)
   localStorage.setItem("coline_ugc_v2",JSON.stringify(marques));
   flashSave();
-  // Then sync to Google Sheets
-  apiCall("saveMarques",{marques});
+  // Sync to Airtable: clear and recreate
+  await atClear("Marques");
+  const fields = marques.map(m=>{
+    const f={};
+    ["id","nom","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
+    "statut","date_contact","date_r1","date_r2","date_relance","resultat","type_contenu","statut_contenu",
+    "date_livraison","produit_recu","date_produit","tarif_propose","montant","paiement","note",
+    "paie_delais","recontacter","tags","notes","date_ajout"].forEach(k=>{if(m[k])f[k]=String(m[k]);});
+    return f;
+  });
+  atCreate("Marques", fields);
 }
 async function saveMsgs(){
   localStorage.setItem("coline_ugc_msgs",JSON.stringify(msgs));
   flashSave();
-  apiCall("saveMsgs",{msgs});
+  saveSetting("msgs", msgs);
 }
 async function saveObjData(){
   localStorage.setItem("coline_ugc_obj",JSON.stringify(objectifs));
-  apiCall("saveObjectifs",{objectifs});
+  saveSetting("objectifs", objectifs);
 }
 async function saveProfileData(){
   localStorage.setItem("coline_ugc_profile",JSON.stringify(profile));
-  apiCall("saveProfile",{profile});
+  saveSetting("profile", profile);
 }
 async function saveNotes(){
   localStorage.setItem("coline_ugc_notes",JSON.stringify(notes));
-  apiCall("saveNotes",{notes});
+  saveSetting("notes", notes);
 }
 function flashSave(){const i=document.getElementById("save-ind");i.classList.add("show");setTimeout(()=>i.classList.remove("show"),2000);}
 
