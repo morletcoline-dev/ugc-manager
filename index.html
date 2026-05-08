@@ -486,8 +486,21 @@ async function atClear(table){
 async function atCreate(table,fieldsArray){
   try{
     for(let i=0;i<fieldsArray.length;i+=10){
-      const batch=fieldsArray.slice(i,i+10).map(f=>({fields:f}));
-      await fetch(AT_URL+encodeURIComponent(table),{method:"POST",headers:AT_HEADERS,body:JSON.stringify({records:batch})});
+      const batch=fieldsArray.slice(i,i+10).map(f=>{
+        // Clean fields - remove empty, null, and non-string values
+        const clean={};
+        Object.entries(f).forEach(([k,v])=>{
+          if(v!==null&&v!==undefined&&String(v).trim()!=="") clean[k]=String(v).trim();
+        });
+        // Airtable requires at least one field
+        if(Object.keys(clean).length===0) clean.nom="Sans nom";
+        return {fields:clean};
+      });
+      const res=await fetch(AT_URL+encodeURIComponent(table),{method:"POST",headers:AT_HEADERS,body:JSON.stringify({records:batch})});
+      if(!res.ok){
+        const err=await res.json();
+        console.error("AT batch error:",err);
+      }
     }
     return true;
   }catch(e){console.error("AT CREATE error:",e);return false;}
