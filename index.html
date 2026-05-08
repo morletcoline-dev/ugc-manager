@@ -318,6 +318,17 @@ h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;font-st
     </div>
     <p style="font-size:13px;color:var(--text-muted);">Seule la colonne <strong>nom</strong> est obligatoire. Les autres sont optionnelles.</p>
   </div>
+  <!-- EXPORT CARD -->
+  <div class="card" style="margin-bottom:16px;border-color:var(--vert);">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:var(--vert);margin-bottom:4px;">💾 Exporter mes marques</p>
+        <p style="font-size:13px;color:var(--text-muted);">Télécharge toutes tes marques en CSV — pour sauvegarde ou import ailleurs.</p>
+      </div>
+      <button class="btn btn-green" onclick="exportCSV()">Télécharger CSV</button>
+    </div>
+  </div>
+
   <!-- DEDUP CARD -->
   <div class="card" style="margin-bottom:16px;border-color:var(--or);">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
@@ -1013,6 +1024,29 @@ function importBrands(mode){
   document.getElementById("drop-zone").innerHTML=`<div style="font-size:36px;margin-bottom:10px;">✅</div><p><strong>${pendingImport.length} marque(s) importée(s) avec succès !</strong></p><p style="font-size:12px;margin-top:8px;cursor:pointer;" onclick="showView('liste')">Voir ma liste de marques →</p>`;
   toast(`${pendingImport.length} marques importées !`,"ok");
   pendingImport=[];
+}
+
+// ===================== EXPORT CSV =====================
+function exportCSV(){
+  if(marques.length===0){toast("Aucune marque à exporter !");return;}
+  const headers=["id","nom","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
+    "statut","date_contact","date_r1","date_r2","date_relance","resultat","type_contenu","statut_contenu",
+    "date_livraison","produit_recu","date_produit","tarif_propose","montant","paiement","note",
+    "paie_delais","recontacter","tags","notes","date_ajout"];
+  const rows=[headers.join(",")];
+  marques.forEach(m=>{
+    rows.push(headers.map(h=>{
+      const val=String(m[h]||"").replace(/"/g,'""');
+      return val.includes(",")||val.includes("\n")||val.includes('"')?`"${val}"`:val;
+    }).join(","));
+  });
+  const blob=new Blob(["\uFEFF"+rows.join("\n")],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="marques-ugc-coline.csv";
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast(`${marques.length} marques exportées ✓`,"ok");
 }
 
 // ===================== DEDUPLICATION =====================
