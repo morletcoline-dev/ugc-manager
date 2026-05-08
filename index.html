@@ -583,14 +583,14 @@ async function syncMarquesToAirtable(){
     await atClear("Marques");
     if(marques.length===0) return;
     const fields = marques.map(m=>{
-      const f={};
-      ["id","nom","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
+      // Airtable primary field must be "Name"
+      const f={"Name": m.nom||"Sans nom"};
+      ["id","categorie","contact_nom","canal_principal","email","instagram","site","telephone",
       "statut","date_contact","date_r1","date_r2","date_relance","resultat","type_contenu","statut_contenu",
       "date_livraison","produit_recu","date_produit","tarif_propose","montant","paiement","note",
       "paie_delais","recontacter","tags","notes","date_ajout"].forEach(k=>{
         if(m[k]&&String(m[k]).trim()) f[k]=String(m[k]).trim();
       });
-      if(!f.nom) f.nom="Sans nom";
       return f;
     });
     await atCreate("Marques", fields);
