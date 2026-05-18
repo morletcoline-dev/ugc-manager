@@ -607,15 +607,27 @@ async function submitEmail(){
   btn.disabled = false;
   
   if(ok){
-    // Update contact date
+    // Update contact date and auto-set relance date
     const m = marques.find(x=>x.id===marqueId);
     if(m){
-      if(!m.date_contact) m.date_contact = new Date().toISOString().split("T")[0];
-      else if(!m.date_r1) m.date_r1 = new Date().toISOString().split("T")[0];
-      else if(!m.date_r2) m.date_r2 = new Date().toISOString().split("T")[0];
+      const today = new Date();
+      const relanceDate = new Date(today);
+      relanceDate.setDate(today.getDate() + 7);
+      const fmt = d => d.toISOString().split("T")[0];
+      if(!m.date_contact){ 
+        m.date_contact = fmt(today);
+        m.date_relance = fmt(relanceDate); // Auto relance J+7
+      } else if(!m.date_r1){ 
+        m.date_r1 = fmt(today);
+        m.date_relance = fmt(relanceDate); // Auto relance J+7
+      } else if(!m.date_r2){ 
+        m.date_r2 = fmt(today);
+        m.date_relance = fmt(relanceDate); // Auto relance J+7
+      }
       if(m.statut==="a_contacter") m.statut = "contacte";
       marques = marques.map(x=>x.id===marqueId?m:x);
       saveData();
+      toast("✅ Email envoyé ! Relance prévue dans 7 jours","ok");
     }
     closeModal("modal-email");
   }
