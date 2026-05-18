@@ -356,6 +356,27 @@ h2{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;font-st
 </main>
 
 <!-- MODALS -->
+
+<!-- EMAIL MODAL -->
+<div class="modal-overlay" id="modal-email">
+  <div class="modal" style="max-width:580px;text-align:left;">
+    <p id="email-modal-title" style="font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:var(--rose);margin-bottom:16px;">📧 Envoyer un email</p>
+    <input type="hidden" id="email-marque-id">
+    <div class="field"><label>À (adresse email)</label><input id="email-to" type="email" placeholder="contact@marque.com"></div>
+    <div class="field"><label>Objet</label><input id="email-subject" placeholder="Objet de l'email"></div>
+    <div class="field"><label>Message — modifie librement avant d'envoyer !</label>
+      <textarea id="email-body" style="min-height:220px;width:100%;border:1px solid var(--beige);border-radius:8px;padding:12px;font-size:13px;font-family:'Jost',sans-serif;background:var(--creme);color:var(--brun);outline:none;resize:vertical;line-height:1.7;"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+      <div id="gmail-status" style="font-size:12px;color:var(--text-muted);"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="closeModal('modal-email')">Annuler</button>
+        <button class="btn btn-primary" id="send-email-btn" onclick="submitEmail()">✉️ Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-delete">
   <div class="modal">
     <p>Supprimer cette marque ?<br><span style="color:var(--text-muted);font-size:13px;">Cette action est irréversible.</span></p>
@@ -451,6 +472,129 @@ let profile={"nom":"Coline Morlet","spec":"Créatrice UGC · Lifestyle · DIY ·
 let notes=[];
 let currentView="dashboard",editingId=null,deleteTargetId=null,filterCat="toutes",relTab="a_relancer";
 let pendingImport=[];
+
+
+// ===================== GMAIL AUTH =====================
+const GMAIL_CLIENT_ID = "912924272104-vc15cgu7g9ofspq19eok6b8nclnkpscq.apps.googleusercontent.com";
+const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.send";
+let gmailToken = localStorage.getItem("gmail_token") || null;
+let gmailTokenExpiry = parseInt(localStorage.getItem("gmail_token_expiry") || "0");
+
+function isGmailConnected(){
+  return gmailToken && Date.now() < gmailTokenExpiry;
+}
+
+function connectGmail(){
+  return new Promise((resolve, reject) => {
+    const params = new URLSearchParams({
+      client_id: GMAIL_CLIENT_ID,
+      redirect_uri: window.location.origin + window.location.pathname,
+      response_type: "token",
+      scope: GMAIL_SCOPES,
+      prompt: "consent"
+    });
+    const authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString();
+    const popup = window.open(authUrl, "gmail_auth", "width=500,height=600,left=200,top=100");
+    const interval = setInterval(() => {
+      try {
+        if(popup.closed){ clearInterval(interval); reject("Fenêtre fermée"); return; }
+        const hash = popup.location.hash;
+        if(hash && hash.includes("access_token")){
+          clearInterval(interval);
+          popup.close();
+          const p = new URLSearchParams(hash.substring(1));
+          gmailToken = p.get("access_token");
+          const expiresIn = parseInt(p.get("expires_in") || "3600");
+          gmailTokenExpiry = Date.now() + expiresIn * 1000;
+          localStorage.setItem("gmail_token", gmailToken);
+          localStorage.setItem("gmail_token_expiry", gmailTokenExpiry.toString());
+          resolve(gmailToken);
+        }
+      } catch(e) {}
+    }, 500);
+  });
+}
+
+async function sendGmail(to, subject, body){
+  if(!isGmailConnected()){
+    try { await connectGmail(); } 
+    catch(e) { toast("Connexion Gmail annulée"); return false; }
+  }
+  const email = ["From: maisoncoline@gmail.com",
+    "To: " + to,
+    "Subject: =?utf-8?B?" + btoa(unescape(encodeURIComponent(subject))) + "?=",
+    "MIME-Version: 1.0",
+    "Content-Type: text/plain; charset=utf-8",
+    "Content-Transfer-Encoding: base64",
+    "",
+    btoa(unescape(encodeURIComponent(body)))
+  ].join("\n");
+  const encoded = btoa(email).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  try {
+    const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + gmailToken, "Content-Type": "application/json" },
+      body: JSON.stringify({ raw: encoded })
+    });
+    if(res.ok){ toast("✅ Email envoyé avec succès !","ok"); return true; }
+    else { 
+      const err = await res.json();
+      console.error("Gmail error:", err);
+      toast("Erreur envoi email"); return false; 
+    }
+  } catch(e){ console.error("Gmail send error:", e); toast("Erreur envoi email"); return false; }
+}
+
+function openEmailModal(marqueId){
+  const m = marques.find(x=>x.id===marqueId);
+  if(!m) return;
+  // Pick best message template based on status
+  let msgTemplate = msgs[0];
+  if(m.date_r1) msgTemplate = msgs.find(x=>x.titre.includes("relance"))||msgs[2];
+  const corps = msgTemplate.corps
+    .replace(/\[Nom de la marque\]/g, m.nom)
+    .replace(/\[Marque\]/g, m.nom)
+    .replace(/\[Prénom\]/g, m.contact_nom||m.nom)
+    .replace(/\[date\]/g, new Date().toLocaleDateString("fr-FR"));
+
+  document.getElementById("email-modal-title").textContent = "📧 Email à " + m.nom;
+  document.getElementById("email-to").value = m.email||"";
+  document.getElementById("email-subject").value = "Collaboration UGC – Coline Morlet";
+  document.getElementById("email-body").value = corps;
+  document.getElementById("email-marque-id").value = marqueId;
+  document.getElementById("modal-email").classList.add("open");
+}
+
+async function submitEmail(){
+  const to = document.getElementById("email-to").value.trim();
+  const subject = document.getElementById("email-subject").value.trim();
+  const body = document.getElementById("email-body").value.trim();
+  const marqueId = document.getElementById("email-marque-id").value;
+  if(!to){ toast("Adresse email manquante !"); return; }
+  if(!subject||!body){ toast("Objet ou message manquant !"); return; }
+  
+  const btn = document.getElementById("send-email-btn");
+  btn.textContent = "Envoi en cours...";
+  btn.disabled = true;
+  
+  const ok = await sendGmail(to, subject, body);
+  btn.textContent = "Envoyer";
+  btn.disabled = false;
+  
+  if(ok){
+    // Update contact date
+    const m = marques.find(x=>x.id===marqueId);
+    if(m){
+      if(!m.date_contact) m.date_contact = new Date().toISOString().split("T")[0];
+      else if(!m.date_r1) m.date_r1 = new Date().toISOString().split("T")[0];
+      else if(!m.date_r2) m.date_r2 = new Date().toISOString().split("T")[0];
+      if(m.statut==="a_contacter") m.statut = "contacte";
+      marques = marques.map(x=>x.id===marqueId?m:x);
+      saveData();
+    }
+    closeModal("modal-email");
+  }
+}
 
 // ===================== AIRTABLE SYNC =====================
 const AT_HEADERS = {"Authorization":"Bearer "+AT_TOKEN,"Content-Type":"application/json"};
@@ -557,6 +701,11 @@ async function loadAllData(){
   showLoader(false);
   renderDash();
   renderMsgs();
+  // Check Gmail status
+  setTimeout(()=>{
+    const el=document.getElementById("gmail-status");
+    if(el) el.textContent = isGmailConnected() ? "✅ Gmail connecté" : "🔗 Gmail non connecté — connexion au premier envoi";
+  }, 2000);
 }
 
 function showLoader(show){
@@ -883,6 +1032,7 @@ function openDetail(id){
       <button class="btn btn-outline btn-sm" onclick="showView('liste')">← Retour</button>
       <h2 style="margin-bottom:0;border:none;flex:1;">${m.nom} ${cat?cat.emoji:""}</h2>
       <button class="btn btn-outline btn-sm" onclick="openEdit('${m.id}')">✏️ Modifier</button>
+      ${m.email?`<button class="btn btn-primary btn-sm" onclick="openEmailModal('${m.id}')">✉️ Email</button>`:""}
       <button class="btn btn-danger btn-sm" onclick="askDel('${m.id}')">🗑</button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
