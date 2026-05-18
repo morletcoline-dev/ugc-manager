@@ -566,22 +566,12 @@ function openEmailModal(marqueId){
   // Choose message based on contact stage
   let corps;
   if(!m.date_contact){
-    // Premier contact
-    corps = `Bonjour ${m.nom},
-
-Je me permets de vous contacter car je suis créatrice de contenu UGC spécialisée dans la création de vidéos authentiques et engageantes pour les réseaux sociaux.
-
-Après avoir développé une communauté de plus de 24 000 abonnés sur Instagram grâce à des formats courts performants, j'accompagne aujourd'hui les marques dans la création de contenus naturels, pensés pour capter l'attention et créer une vraie connexion avec leur audience.
-
-En découvrant votre univers, j'ai immédiatement imaginé plusieurs idées de contenus qui pourraient parfaitement s'intégrer à votre marque 🙂
-
-Vous pouvez découvrir mon portfolio ici : https://maisoncoline.my.canva.site/coline-portfolio-ugc
-
-Je serais ravie d'échanger avec vous autour d'une éventuelle collaboration.
-
-Belle journée,
-Coline Morlet
-📱 @maison_coline.couture`;
+    // Premier contact - utilise le message m1
+    const m1 = msgs.find(x=>x.id==="m1")||msgs[0];
+    corps = m1.corps
+      .replace(/\[Nom de la marque\]/g, m.nom)
+      .replace(/\[Marque\]/g, m.nom)
+      .replace(/\[Prénom\]/g, m.contact_nom||m.nom);
   } else if(m.date_contact && !m.date_r1){
     // Relance 1
     const relMsg = msgs.find(x=>x.titre.toLowerCase().includes("relance"))||msgs[2];
